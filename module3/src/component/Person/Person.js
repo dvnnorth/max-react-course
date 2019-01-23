@@ -5,13 +5,13 @@ import './Person.css';
 
 const Person = props => (
   <div className="Person">
-    <p onClick={() => props.click(props.index, props.age)}>
+    <p onClick={event => props.click(event, props.index)}>
       My name is {props.name} and I am {props.age}
     </p>
     <div>{props.children}</div>
     <input
       type="text"
-      onChange={event => props.changeName(event, props.index, props.age)}
+      onChange={event => props.changeName(event, props.index)}
       value={props.name}
     />
   </div>

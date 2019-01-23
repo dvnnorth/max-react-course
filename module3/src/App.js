@@ -12,12 +12,13 @@ class App extends Component {
       { name: 'Manu', age: '30' },
       { name: 'Max', age: '29' },
       { name: 'Jens', age: '33' }
-    ]
+    ],
+    showPeople: true
   };
 
   switchNameHandler = (index, age, name) => {
     let randomNames = ['Jane', 'John', 'Kyle', 'Thurgood', 'Michelle'];
-    let newPeople = this.state.people;
+    let newPeople = [...this.state.people];
     let newPerson = {
       name: name
         ? name
@@ -30,49 +31,71 @@ class App extends Component {
     });
   };
 
-  nameChangeHandler = (event, index, age) => {
-    this.switchNameHandler(index, age, event.target.value);
+  nameChangeHandler = (event, index) => {
+    const people = [...this.state.people]
+    people.splice(index, 1, {
+      name: event.target.value,
+      age: this.state.people[index].age
+    });
+    this.setState({ people });
+  };
+
+  deletePersonHandler = (event, index) => {
+    event.preventDefault();
+    const people = [...this.state.people];
+    people.splice(index, 1);
+    this.setState({ people });
+  };
+
+  toggleShowPeople = () => {
+    let show = this.state.showPeople;
+    this.setState({ showPeople: !show });
   };
 
   render() {
+    let people = null;
+
+    if (this.state.showPeople) {
+      people = (
+        <div>
+          {this.state.people.map((person, index) => (
+            <Person
+              key={index}
+              index={index}
+              name={person.name}
+              age={person.age}
+              click={event => this.deletePersonHandler(event, index)}
+              changeName={this.nameChangeHandler}
+            >
+              {person.name === 'Jens' ? (
+                <p>
+                  Here is a short biography about {this.state.people.length - 1}
+                  : He is a human. I told you it was short!
+                </p>
+              ) : null}
+            </Person>
+          ))}
+        </div>
+      );
+    }
+
     return (
       <div className="App">
         <h1>Hi, I'm a React app!</h1>
         <p>This is really working.</p>
         <button
-          onClick={this.switchNameHandler}
+          onClick={this.toggleShowPeople}
           style={{
             backgroundColor: 'white',
             font: 'inherit',
-            border: '1px solid blue',
+            border: '1px solid red',
             padding: '8px',
             cursor: 'pointer'
           }}
         >
-          Switch Name
+          Show People
         </button>
-        {this.state.people.slice(0, 4).map((person, index) => (
-          <Person
-            key={index}
-            index={index}
-            name={person.name}
-            age={person.age}
-            click={this.switchNameHandler}
-            changeName={this.nameChangeHandler}
-          />
-        ))}
-        <Person
-          name={this.state.people[4].name}
-          age={this.state.people[4].age}
-          index={4}
-          click={this.switchNameHandler}
-          changeName={this.nameChangeHandler}
-        >
-          <p>
-            Here is a short biography about {this.state.people[4].name}: He is a
-            human. I told you it was short!
-          </p>
-        </Person>
+        {people}
       </div>
     );
   }
